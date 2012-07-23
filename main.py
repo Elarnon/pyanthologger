@@ -1,6 +1,3 @@
-""" Ici le super message d'aide d'a3nm
-"""
-
 class Logger:
   def __init__(self, log_file, mem_size):
     self.f = log_file
@@ -49,12 +46,15 @@ if __name__ == "__main__":
   parser.add_argument('--log-prefix', default='/tmp/log_', help='prefix for the chan log files (/tmp/log_)')
   parser.add_argument('--mem-size', default=1000, type=int, help='maximum number of messages to keep in RAM (1000)')
   parser.add_argument('--replies-file', help='file containing the replies', required=True)
+  parser.add_argument('--help-file', help='file containing a super helpful help message', required=True)
   args = parser.parse_args()
   talk = sys.stdout
   irctk = re.compile('^\[(?P<chan>[^]]*)\] <(?P<author>[^>]*)> (?:(?:' + args.name + ':\\s*(?P<cmd>.*))|(?P<msg>.*))$')
   regex = re.compile('^(?P<begin>.*?)\\s*(?:\.\.\.\\s*(?P<end>.*?)\\s*)?$')
   with open(args.replies_file, 'r') as f:
     replies = f.readlines()
+  with open(args.help_file, 'r') as f:
+    helps = f.readlines()
   chans = {}
 
   def save():
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     if cmd is None: # Message
       chans[chan].log('%d [%s] <%s> %s' % (time.time(), chan, author, msg))
     elif cmd.strip() == 'help':
-      talk.writelines('[' + chan + '] ' + line + '\n' for line in __doc__.split())
+      talk.writelines('[' + chan + '] ' + line + '\n' for line in helps)
     else:
       begin, end = regex.match(cmd).groups()
       res = chans[chan].find_quote(begin, end)
