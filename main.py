@@ -16,8 +16,7 @@ class Logger:
     if len(self.mem) > self.MAX_MEM_SIZE:
       self.flush(int(len(self.mem)/2))
 
-  def flush(self, size=None):
-    if size is None: size = 0
+  def flush(self, size=0):
     with open(self.f, 'a') as f:
       f.writelines(self.mem[:size])
     self.mem = self.mem[size:]
@@ -38,24 +37,22 @@ class Logger:
       return "Je perçois bien la fin, mais n'entrevois pas le début."
 
 if __name__ == "__main__":
-  import sys, argparse, re, atexit, time
+  import sys, argparse, re, atexit, time, os
   from random import choice
   parser = argparse.ArgumentParser(description='Quote bot')
   parser.add_argument('--name', default='anthologger', help='name of the bot (anthologger)')
   parser.add_argument('--quote-prefix', default='quote_', help='prefix for the quote files (quote_)')
   parser.add_argument('--log-prefix', default='/tmp/log_', help='prefix for the chan log files (/tmp/log_)')
   parser.add_argument('--mem-size', default=1000, type=int, help='maximum number of messages to keep in RAM (1000)')
-  parser.add_argument('--replies-file', help='file containing the replies', required=True)
-  parser.add_argument('--help-file', help='file containing a super helpful help message', required=True)
+  parser.add_argument('--replies-file', default='replies', help='file containing the replies')
+  parser.add_argument('--help-prefix', default='./', help='prefix for help files')
   args = parser.parse_args()
   talk = sys.stdout
   irctk = re.compile('^\[(?P<chan>[^]]*)\] <(?P<author>[^>]*)> (?:(?:' + args.name + ':\\s*(?P<cmd>.*))|(?P<msg>.*))$')
   regex = re.compile('^(?P<begin>.*?)\\s*(?:\.\.\.\\s*(?P<end>.*?)\\s*)?$')
   with open(args.replies_file, 'r') as f:
     replies = f.readlines()
-  with open(args.help_file, 'r') as f:
-    helps = f.readlines()
-  chans = {}
+  chans, helps = {}, {}
 
   def save():
     for chan in chans:
@@ -69,10 +66,14 @@ if __name__ == "__main__":
     chan, author, cmd, msg = infos.groups()
     if chan not in chans:
       chans[chan] = Logger(args.log_prefix + chan, args.mem_size)
+      helps[chan] = []
+      if os.path.exists(args.help_prefix + chan):
+        with open(args.help_prefix + chan, 'r') as f:
+          helps[chan] = f.readlines()
     if cmd is None: # Message
       chans[chan].log('%d [%s] <%s> %s' % (time.time(), chan, author, msg))
     elif cmd.strip() == 'help':
-      talk.writelines('[' + chan + '] ' + line + '\n' for line in helps)
+      talk.writelines('[' + chan + '] ' + line + '\n' for line in helps[chan])
     else:
       begin, end = regex.match(cmd).groups()
       res = chans[chan].find_quote(begin, end)
