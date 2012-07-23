@@ -27,10 +27,10 @@ class Logger:
     if end is None: end = begin
     result, matched = [], False
     for line in self:
-      if line.find(begin) != -1: matched = True
+      if line.find(end) != -1: matched = True
       if matched:
         result.insert(0, line)
-        if line.find(end) != -1: break
+        if line.find(begin) != -1: break
     if matched:
       return result
     elif result == []:
