@@ -18,7 +18,8 @@ class Logger:
     if len(self.mem) > self.MAX_MEM_SIZE:
       self.flush(int(len(self.mem)/2))
 
-  def flush(self, size=0):
+  def flush(self, size=None):
+    if size is None: size = len(self.mem)
     with open(self.f, 'a') as f:
       f.writelines(self.mem[:size])
     self.mem = self.mem[size:]
