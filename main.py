@@ -47,8 +47,9 @@ if __name__ == "__main__":
   parser.add_argument('--quote-prefix', default='quote_', help='prefix for the quote files (quote_)')
   parser.add_argument('--log-prefix', default='/tmp/log_', help='prefix for the chan log files (/tmp/log_)')
   parser.add_argument('--mem-size', default=1000, type=int, help='maximum number of messages to keep in RAM (1000)')
-  parser.add_argument('--replies-file', default='replies', help='file containing the replies')
-  parser.add_argument('--help-prefix', default='./', help='prefix for help files')
+  parser.add_argument('--replies-file', default='replies', help='file containing the replies (replies)')
+  parser.add_argument('--help-prefix', default='./', help='prefix for help files (./)')
+  parser.add_argument('--max-len', default=100, type=int, help='maximum length of a quote (in lines, 100)')
   args = parser.parse_args()
   talk = sys.stdout
   irctk = re.compile('^\[(?P<chan>[^]]*)\] <(?P<author>[^>]*)> (?:(?:' + args.name + ':\\s*(?P<cmd>.*))|(?P<msg>.*))$')
@@ -81,8 +82,11 @@ if __name__ == "__main__":
       begin, end = regex.match(cmd).groups()
       res = chans[chan].find_quote(begin, end)
       if type(res) == list:
-        with open(args.quote_prefix + chan, 'a') as f:
-          f.writelines(res + ['\n'])
-        talk.write('[' + chan + '] ' + choice(replies))
+        if len(res) > args.max_len:
+          talk.write('[' + chan + '] Désolé, cette citation est trop longue (plus de ' + str(args.max_len) + ' lignes)')
+        else:
+          with open(args.quote_prefix + chan, 'a') as f:
+            f.writelines(res + ['\n'])
+          talk.write('[' + chan + '] ' + choice(replies))
       else:
         talk.write('[' + chan + '] ' + res + '\n')
