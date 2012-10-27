@@ -83,7 +83,7 @@ if __name__ == "__main__":
       res = chans[chan].find_quote(begin, end)
       if type(res) == list:
         if len(res) > args.max_len:
-          talk.write('[' + chan + '] Désolé, cette citation est trop longue (plus de ' + str(args.max_len) + ' lignes)')
+          talk.write('[' + chan + '] Désolé, cette citation est trop longue (plus de ' + str(args.max_len) + ' lignes)\n')
         else:
           with open(args.quote_prefix + chan, 'a') as f:
             f.writelines(res + ['\n'])
