@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
 class Logger:
@@ -31,7 +31,7 @@ class Logger:
     result, matched = [], False
     for line in self:
       if len(result) > self.MAX_LENGTH:
-        return "Désolé, cette citation est trop longue (plus de %s lignes)." % str(self.max_len)
+        return "Désolé, cette citation est trop longue (plus de %s lignes)." % str(self.MAX_LENGTH)
       if line.find(end) != -1: matched = True
       if matched:
         result.insert(0, line)
