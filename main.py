@@ -31,7 +31,9 @@ class Logger:
     for line in self:
       if len(result) > self.MAX_LENGTH:
         return "Désolé, cette citation est trop longue (plus de %s lignes)." % str(self.MAX_LENGTH)
-      if line.find(end) != -1: matched = True
+      if line.find(end) != -1:
+        matched = True
+        result = [] # log until the *last* occurrence of end
       if matched:
         result.insert(0, line)
         if line.find(begin) != -1: break
