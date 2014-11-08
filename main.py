@@ -35,8 +35,8 @@ class Logger:
         for line in self:
             if len(result) > self.MAX_LENGTH:
                 return (
-                    "Désolé, cette citation est trop longue (max. %s lignes)."
-                    % str(self.MAX_LENGTH)
+                    "Désolé, cette citation est trop longue (max. {} lignes)."
+                    .format(self.MAX_LENGTH)
                 )
             if line.find(end) != -1:
                 matched = True
@@ -109,12 +109,16 @@ if __name__ == "__main__":
 
         cmdinfos = command.match(content)
         if cmdinfos is None:
-            chans[chan].log('%d [%s] %s' % (time.time(), chan, content))
+            chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
         else:
             author, cmd = cmdinfos.groups()
             if cmd.strip() == 'help':
                 talk.writelines(
-                    '[' + chan + ']' + line + '\n' for line in helps[chan])
+                    '[{chan}] {line}\n'.format(
+                        chan=chan, line=line
+                    )
+                    for line in helps[chan]
+                )
                 talk.flush()
             else:
                 begin, end = regex.match(cmd).groups()
@@ -122,8 +126,11 @@ if __name__ == "__main__":
                 if type(res) == list:
                     with open(args.quote_prefix + chan, 'a') as f:
                         f.writelines(res + ['\n'])
-                    talk.write('[' + chan + '] ' + choice(replies))
+                    talk.write('[{chan}] {reply}'.format(
+                        chan=chan,
+                        reply=choice(replies)
+                    ))
                     talk.flush()
                 else:
-                    talk.write('[' + chan + '] ' + res + '\n')
+                    talk.write('[{chan}] {res}\n'.format(chan=chan, res=res))
                     talk.flush()
