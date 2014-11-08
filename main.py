@@ -83,7 +83,7 @@ if __name__ == "__main__":
     irctk = re.compile(r'^\[(?P<chan>[^]]*)\](?P<content>.*)$')
     command = re.compile(
         r'^ <(?P<author>[^>]*)>\s*' + args.name + r'\s*:\s*(?P<cmd>.*)$')
-    regex = re.compile(r'^(?P<begin>.*?)\s*(?:\.\.\.\s*(?P<end>.*?)\s*)?$')
+    regex = re.compile(r'^(?P<begin>.*?)\s*(?:\.\.+\s*(?P<end>.*?)\s*)?$')
     with open(args.replies_file, 'r') as f:
         replies = f.readlines()
     chans, helps = {}, {}
