@@ -38,8 +38,8 @@ class Logger:
                     "Désolé, cette citation est trop longue (max. {} lignes)."
                     .format(self.MAX_LENGTH)
                 )
-            
-            if line.find(end) != -1:
+            close = line.find(']')
+            if close != -1 and line[close+1:].find(end) != -1:
                 matched = True
                 result = []  # log until the *last* occurrence of end
             if matched:
