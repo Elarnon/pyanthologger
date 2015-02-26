@@ -15,7 +15,7 @@ class BocalEmailQuoter:
         content = ("{} a considéré que la citation suivante, ".format(author) +
                    "toute fraîche sortie d'IRC, pourrait "
                    "constituer une brève.\n\n" +
-                   "\n".join([cleanup(line) for line in lines]))
+                   "".join([cleanup(line) for line in lines]))
         mail = MIMEText(content.encode('utf-8'), 'plain', 'utf-8')
         mail['Subject'] = Header("Brève sur IRC", 'utf-8')
         mail['From'] = 'anthologger@ulminfo.fr'
