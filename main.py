@@ -2,15 +2,17 @@
 
 import smtplib
 from email.mime.text import MIMEText
+from email.header import Header
 
 
 class BocalEmailQuoter:
     def quote(self, chan, author, lines):
-        mail = MIMEText("{} a considéré que la citation suivante, "
-                        "toute fraîche sortie d'IRC, pourrait "
-                        "constituer une brève.\n\n" +
-                        "> ".join(lines))
-        mail['Subject'] = "Brève sur IRC"
+        content = ("{} a considéré que la citation suivante, "
+                   "toute fraîche sortie d'IRC, pourrait "
+                   "constituer une brève.\n\n" +
+                   "> ".join(lines))
+        mail = MIMEText(content.encode('utf-8'), 'plain', 'utf-8')
+        mail['Subject'] = Header("Brève sur IRC", 'utf-8')
         mail['From'] = 'anthologger@ulminfo.fr'
         mail['To'] = 'bocal@clipper.ens.fr'
         s = smtplib.SMTP('localhost')
