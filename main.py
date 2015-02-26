@@ -1,5 +1,26 @@
 ﻿#!/usr/bin/env python3
 
+import smtplib
+from email.mime.text import MIMEText
+
+
+class BocalEmailQuoter:
+    def quote(self, chan, author, lines):
+        mail = MIMEText("{} a considéré que la citation suivante, "
+                        "toute fraîche sortie d'IRC, pourrait "
+                        "constituer une brève.\n\n" +
+                        "> ".join(lines))
+        mail['Subject'] = "Brève sur IRC"
+        mail['From'] = 'anthologger@ulminfo.fr'
+        mail['To'] = 'bocal@clipper.ens.fr'
+        s = smtplib.SMTP('localhost')
+        s.send_message(mail)
+        s.quit()
+
+special_quoters = {
+    '#bocal': BocalEmailQuoter(),
+}
+
 
 class Logger:
 
@@ -18,7 +39,7 @@ class Logger:
 
     def log(self, line):
         self.mem.append(line + '\n')
-        if len(self.mem) > self.MAX_MEM_SIZE:
+        while len(self.mem) > self.MAX_MEM_SIZE:
             self.flush(int(len(self.mem) / 2))
 
     def flush(self, size=None):
@@ -125,6 +146,8 @@ if __name__ == "__main__":
                 begin, end = regex.match(cmd).groups()
                 res = chans[chan].find(begin, end)
                 if type(res) == list:
+                    if chan in special_quoters:
+                        special_quoters[chan].quote(chan, author, res)
                     with open(args.quote_prefix + chan, 'a') as f:
                         f.writelines(res + ['\n'])
                     talk.write('[{chan}] {reply}'.format(
