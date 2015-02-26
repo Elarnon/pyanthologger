@@ -5,12 +5,17 @@ from email.mime.text import MIMEText
 from email.header import Header
 
 
+def cleanup(s):
+    pos = s.find(']')
+    return s[pos + 1:]
+
+
 class BocalEmailQuoter:
     def quote(self, chan, author, lines):
-        content = ("{} a considéré que la citation suivante, "
+        content = ("{} a considéré que la citation suivante, ".format(author) +
                    "toute fraîche sortie d'IRC, pourrait "
                    "constituer une brève.\n\n" +
-                   "> ".join(lines))
+                   "\n".join([cleanup(line) for line in lines]))
         mail = MIMEText(content.encode('utf-8'), 'plain', 'utf-8')
         mail['Subject'] = Header("Brève sur IRC", 'utf-8')
         mail['From'] = 'anthologger@ulminfo.fr'
