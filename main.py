@@ -113,7 +113,8 @@ if __name__ == "__main__":
     irctk = re.compile(r'^\[(?P<chan>[^]]*)\](?P<content>.*)$')
     command = re.compile(
         r'^ <(?P<author>[^>]*)>\s*' + args.name + r'\s*:\s*(?P<cmd>.*)$')
-    regex = re.compile(r'^(?P<begin>.*?)\s*(?:\.\.+\s*(?P<end>.*?)\s*)?$')
+    regex = re.compile(
+        r'^(?P<email>email\s*)?(?P<begin>.*?)\s*(?:\.\.+\s*(?P<end>.*?)\s*)?$')
     with open(args.replies_file, 'r') as f:
         replies = f.readlines()
     chans, helps = {}, {}
@@ -142,7 +143,8 @@ if __name__ == "__main__":
             chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
         else:
             author, cmd = cmdinfos.groups()
-            if cmd.strip() == 'help':
+            cmd = cmd.strip()
+            if cmd == 'help':
                 talk.writelines(
                     '[{chan}] {line}\n'.format(
                         chan=chan, line=line
@@ -151,17 +153,22 @@ if __name__ == "__main__":
                 )
                 talk.flush()
             else:
-                begin, end = regex.match(cmd).groups()
+                email, begin, end = regex.match(cmd).groups()
                 res = chans[chan].find(begin, end)
                 if type(res) == list:
-                    if chan in special_quoters:
-                        special_quoters[chan].quote(chan, author, res)
                     with open(args.quote_prefix + chan, 'a') as f:
                         f.writelines(res + ['\n'])
                     talk.write('[{chan}] {reply}'.format(
                         chan=chan,
                         reply=choice(replies)
                     ))
+                    if email:
+                        if chan in special_quoters:
+                            special_quoters[chan].quote(chan, author, res)
+                        else:
+                            talk.write("[{chan}] "
+                                       "Je ne sais pas à qui "
+                                       "envoyer un mail !\n")
                     talk.flush()
                 else:
                     talk.write('[{chan}] {res}\n'.format(chan=chan, res=res))
