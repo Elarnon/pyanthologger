@@ -59,7 +59,7 @@ class Logger:
     def find(self, begin, end=None):
         if end is None:
             end = begin
-        result, matched = [], False
+        result, matched, complete_match = [], False, False
         for line in self:
             if len(result) > self.MAX_LENGTH:
                 return (
@@ -73,8 +73,9 @@ class Logger:
             if matched:
                 result.insert(0, line)
                 if line.find(begin) != -1:
+                    complete_match = True
                     break
-        if matched:
+        if complete_match:
             return result
         elif result == []:
             return (
