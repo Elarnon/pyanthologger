@@ -138,7 +138,6 @@ if __name__ == "__main__":
                 with open(args.help_prefix + chan, 'r') as f:
                     helps[chan] = f.readlines()
 
-        chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
         cmdinfos = command.match(content)
         if cmdinfos is not None:
             author, cmd = cmdinfos.groups()
@@ -172,3 +171,4 @@ if __name__ == "__main__":
                 else:
                     talk.write('[{chan}] {res}\n'.format(chan=chan, res=res))
                     talk.flush()
+        chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
