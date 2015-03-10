@@ -138,10 +138,9 @@ if __name__ == "__main__":
                 with open(args.help_prefix + chan, 'r') as f:
                     helps[chan] = f.readlines()
 
+        chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
         cmdinfos = command.match(content)
-        if cmdinfos is None:
-            chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
-        else:
+        if cmdinfos is not None:
             author, cmd = cmdinfos.groups()
             cmd = cmd.strip()
             if cmd == 'help':
