@@ -60,6 +60,8 @@ class Logger:
     def find(self, begin, end=None):
         if end is None:
             end = begin
+        # Do case-insensitive search to avoid confusions
+        begin, end = begin.lower(), end.lower()
         result, matched, complete_match = [], False, False
         for line in self:
             if len(result) > self.MAX_LENGTH:
@@ -69,13 +71,15 @@ class Logger:
                     )
                 )
 
-            close = line.find(']')
-            if close != -1 and line[close + 1:].find(end) != -1:
+            lower_line = line.lower()
+            close = lower_line.find(']')
+            if close != -1 and lower_line[close + 1:].find(end) != -1:
                 matched = True
                 result = []  # log until the *last* occurrence of end
             if matched:
+                # Log with the proper case
                 result.insert(0, line)
-                if line.find(begin) != -1:
+                if lower_line.find(begin) != -1:
                     complete_match = True
                     break
 
@@ -198,7 +202,3 @@ def main():
                     talk.write('[{chan}] {res}\n'.format(chan=chan, res=res))
                     talk.flush()
         chans[chan].log('{0} [{1}] {2}'.format(time.time(), chan, content))
-
-
-if __name__ == "__main__":
-    main()
